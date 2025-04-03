@@ -77,3 +77,34 @@ def show_landing_page():
         logger.error(f"Erro ao exibir página inicial: {str(e)}")
         st.error("Erro ao carregar a página. Por favor, tente novamente.")
         st.write(f"Detalhes do erro: {str(e)}")
+def hide_sidebar():
+    st.markdown("""
+    <style>
+        /* Ocultar completamente a barra lateral - versão mais agressiva */
+        [data-testid="stSidebar"] {
+            display: none !important;
+        }
+        
+        /* Também tratar de ocultar o botão para abrir a barra lateral */
+        .css-14xtw13.e8zbici0, button[data-testid="collapsedControl"] {
+            display: none !important;
+        }
+        
+        /* Expandir a área principal para ocupar a largura toda */
+        .main .block-container {
+            max-width: 100% !important;
+            padding-left: 2rem !important;
+            padding-right: 2rem !important;
+        }
+        
+        /* Remover o espaço que seria da barra lateral */
+        [data-testid="stAppViewBlockContainer"] {
+            padding-left: 2rem !important;
+            padding-right: 2rem !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+# No início da renderização da landing page
+if st.session_state.page == "landing":
+    hide_sidebar()
