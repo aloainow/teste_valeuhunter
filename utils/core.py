@@ -11,7 +11,7 @@ from urllib.parse import urlencode
 try:
     import stripe
 except ImportError:
-    # Dummy stripe para caso de falha no import
+    # Código dummy para stripe (mantido como está)
     class DummyStripe:
         api_key = None
         class checkout:
@@ -31,10 +31,15 @@ except ImportError:
 logger = logging.getLogger("valueHunter.core")
 
 # Configurações globais
-DATA_DIR = "data"
 if "RENDER" in os.environ:
-    # Em produção no Render, use um caminho padrão para montagem de disco
-    DATA_DIR = "/mnt/value-hunter-data"  # Caminho padrão para discos persistentes
+    # Em produção no Render, use um diretório no qual o app tem permissão de escrita
+    DATA_DIR = os.path.join(os.getcwd(), 'data')
+else:
+    # Em desenvolvimento local, use o diretório configurado ou o padrão
+    DATA_DIR = os.environ.get("DATA_DIR", "data")
+
+# Garantir que o diretório existe
+os.makedirs(DATA_DIR, exist_ok=True)
 
 # Funções de CSS e UI
 def configure_sidebar_visibility():
