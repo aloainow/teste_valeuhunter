@@ -28,7 +28,7 @@ except (ImportError, ModuleNotFoundError):
     # Se falhar, usa uma variável local
     DATA_DIR = os.environ.get("DATA_DIR", "data")
     if "RENDER" in os.environ:
-        DATA_DIR = "/mnt/value-hunter-data"
+        DATA_DIR = os.path.join(os.getcwd(), 'data')
 
 # Garantir que o diretório de dados existe
 os.makedirs(DATA_DIR, exist_ok=True)
