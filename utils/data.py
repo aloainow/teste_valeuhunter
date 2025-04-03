@@ -18,17 +18,8 @@ from typing import Optional, Dict, List, Tuple
 # Configuração de logging
 logger = logging.getLogger("valueHunter.data")
 
-# Referência à variável global do diretório de dados
+# Importar DATA_DIR de core.py e garantir que existe
 from utils.core import DATA_DIR
-# Temos que verificar se já existe uma referência a DATA_DIR
-try:
-    # Primeiro, tentar importar diretamente
-    from utils.core import DATA_DIR
-except (ImportError, ModuleNotFoundError):
-    # Se falhar, usa uma variável local
-    DATA_DIR = os.environ.get("DATA_DIR", "data")
-    if "RENDER" in os.environ:
-        DATA_DIR = os.path.join(os.getcwd(), 'data')
 
 # Garantir que o diretório de dados existe
 os.makedirs(DATA_DIR, exist_ok=True)
