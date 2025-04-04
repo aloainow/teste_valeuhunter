@@ -53,6 +53,156 @@ st.set_page_config(
     menu_items=None
 )
 
+# NOVA SOLUÇÃO PARA OCULTAR A SIDEBAR: ADICIONADA LOGO APÓS set_page_config
+# Atualização do JavaScript para esconder completamente a sidebar
+hide_sidebar_js = """
+<script>
+// Função principal para ocultar itens da barra lateral e do menu
+function hideAllMenuItems() {
+    // Primeira abordagem: ocultar diretamente pela seleção de nós
+    const allMenuItems = document.querySelectorAll('div[data-testid="stSidebarNavItems"] a, [data-testid="stSidebarNav"] li a, div.sidebar a');
+    
+    allMenuItems.forEach(item => {
+        // Ocultar todos os itens
+        const parent = item.closest('li') || item.closest('div[role="listitem"]') || item;
+        if (parent) {
+            parent.style.display = 'none';
+        }
+    });
+    
+    // Segunda abordagem: ocultar usando o container pai
+    const sidebarNavContainer = document.querySelector('[data-testid="stSidebarNavContainer"]');
+    if (sidebarNavContainer) {
+        sidebarNavContainer.style.display = 'none';
+    }
+    
+    // Terceira abordagem: ocultar usando classes
+    document.querySelectorAll('.streamlit-menu, .stSidebarNavItems').forEach(menu => {
+        menu.style.display = 'none';
+    });
+    
+    // Quarta abordagem: atacar o botão de colapso
+    document.querySelectorAll('[data-testid="collapsedControl"]').forEach(button => {
+        button.style.display = 'none';
+    });
+    
+    // Quinta abordagem: ocultar o menu superior
+    document.querySelectorAll('#MainMenu, header[data-testid="stHeader"]').forEach(menu => {
+        menu.style.display = 'none';
+    });
+}
+
+// Executar imediatamente ao carregar
+hideAllMenuItems();
+
+// Executar novamente após pequenos intervalos para pegar elementos carregados dinamicamente
+setTimeout(hideAllMenuItems, 100);
+setTimeout(hideAllMenuItems, 500);
+setTimeout(hideAllMenuItems, 1000);
+setTimeout(hideAllMenuItems, 2000);
+
+// Configurar um observador para monitorar mudanças no DOM
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length) {
+            hideAllMenuItems();
+        }
+    });
+});
+
+// Iniciar observação assim que o documento estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    // Observar o documento inteiro para capturar qualquer alteração dinâmica
+    observer.observe(document.body, { 
+        childList: true, 
+        subtree: true,
+        attributes: true
+    });
+    
+    // Forçar ocultar novamente
+    hideAllMenuItems();
+});
+</script>
+
+<style>
+/* CSS extremamente agressivo para ocultar elementos do menu */
+[data-testid="stSidebarNavContainer"],
+[data-testid="stSidebarNavItems"],
+[data-testid="collapsedControl"],
+#MainMenu, 
+header[data-testid="stHeader"],
+div.sidebar-content,
+div.sidebar nav,
+.stDeployButton {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Mantenha a barra lateral em si, apenas oculte o menu */
+[data-testid="stSidebar"] {
+    display: block !important; 
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: auto !important;
+    min-width: 250px !important;
+}
+
+/* Esconder a seta de colapso */
+button[kind="header"] {
+    display: none !important;
+}
+
+/* Remover espaço reservado para o menu */
+.main .block-container {
+    padding-top: 1rem !important;
+}
+</style>
+"""
+
+# Aplicar o JavaScript IMEDIATAMENTE após set_page_config
+st.components.v1.html(hide_sidebar_js, height=0)
+
+# Aplicar versão CSS de backup para garantir também via CSS
+st.markdown("""
+<style>
+/* Versão CSS extremamente agressiva para ocultar elementos do menu */
+[data-testid="stSidebarNavContainer"],
+[data-testid="stSidebarNavItems"],
+[data-testid="collapsedControl"],
+#MainMenu, 
+header[data-testid="stHeader"],
+div.sidebar-content,
+div.sidebar nav,
+.stDeployButton {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Mantenha a barra lateral em si, apenas oculte o menu */
+[data-testid="stSidebar"] {
+    display: block !important; 
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: auto !important;
+    min-width: 250px !important;
+}
+
+/* Esconder a seta de colapso */
+button[kind="header"] {
+    display: none !important;
+}
+
+/* Remover espaço reservado para o menu */
+.main .block-container {
+    padding-top: 1rem !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Now you can run other Streamlit commands
 hide_admin_pages_completely()
 
