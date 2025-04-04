@@ -14,21 +14,68 @@ if "email" not in st.session_state:
     st.session_state.email = None
 if "show_register" not in st.session_state:
     st.session_state.show_register = False
-if "show_checkout" not in st.session_state:
-    st.session_state.show_checkout = False
-if "checkout_credits" not in st.session_state:
-    st.session_state.checkout_credits = 0
-if "checkout_amount" not in st.session_state:
-    st.session_state.checkout_amount = 0
-if "last_stripe_session_id" not in st.session_state:
-    st.session_state.last_stripe_session_id = None
-if "stripe_test_mode" not in st.session_state:
-    st.session_state.stripe_test_mode = True
-if "debug_mode" not in st.session_state:
-    st.session_state.debug_mode = False
-if "use_sample_data" not in st.session_state:
-    st.session_state.use_sample_data = False
 
+# Add this JavaScript to control the sidebar immediately
+st.components.v1.html("""
+<script>
+// Function to hide specific sidebar items
+function hideAdminItems() {
+    // Target the sidebar items
+    const allItems = document.querySelectorAll('div[role="listitem"] a, [data-testid="stSidebarNavItems"] a, li a');
+    
+    // Loop through all items and hide ones containing app or admin
+    allItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const href = item.getAttribute('href') || '';
+        
+        if (text === 'app' || text === 'admin' || 
+            href.includes('app') || href.includes('admin')) {
+            // Hide the parent list item
+            const parent = item.closest('li') || item.closest('div[role="listitem"]') || item;
+            if (parent) parent.style.display = 'none';
+        }
+    });
+    
+    // Also try to hide the dropdown items
+    const dropdownItems = document.querySelectorAll('div[role="menu"] p, div[role="menu"] a');
+    dropdownItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text === 'app' || text === 'admin') {
+            const parent = item.closest('a') || item.closest('div') || item;
+            if (parent) parent.style.display = 'none';
+        }
+    });
+}
+
+// Execute immediately
+hideAdminItems();
+
+// Also set up an observer to hide items when new elements are added
+const observer = new MutationObserver((mutations) => {
+    hideAdminItems();
+});
+
+// Start observing the sidebar and dialog areas
+setTimeout(() => {
+    const sidebar = document.querySelector('[data-testid="stSidebar"]');
+    const body = document.body;
+    
+    if (sidebar) {
+        observer.observe(sidebar, { childList: true, subtree: true });
+    }
+    
+    observer.observe(body, { childList: true, subtree: true });
+    
+    // Run every half second for the first few seconds
+    let count = 0;
+    const interval = setInterval(() => {
+        hideAdminItems();
+        count++;
+        if (count > 10) clearInterval(interval);
+    }, 500);
+}, 100);
+</script>
+""", height=0)
 # Importar módulos de utilidade
 from utils.core import (
     DATA_DIR, init_session_state, show_valuehunter_logo, 
