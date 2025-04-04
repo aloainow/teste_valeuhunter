@@ -5,7 +5,7 @@ import sys
 import streamlit as st
 from datetime import datetime
 
-# Initialize session state first - before any other code
+# Initialize session state variables (no Streamlit commands here, just dictionary operations)
 if "page" not in st.session_state:
     st.session_state.page = "landing"
 if "authenticated" not in st.session_state:
@@ -14,8 +14,49 @@ if "email" not in st.session_state:
     st.session_state.email = None
 if "show_register" not in st.session_state:
     st.session_state.show_register = False
+# (other session state initializations)
 
-# Add this JavaScript to control the sidebar immediately
+# Importar módulos de utilidade
+from utils.core import (
+    DATA_DIR, init_session_state, show_valuehunter_logo, 
+    configure_sidebar_visibility, apply_global_css, init_stripe,
+    check_payment_success, handle_stripe_errors, hide_admin_pages_completely
+)
+from utils.data import UserManager
+
+# Configuração de logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger("valueHunter")
+
+# Log de diagnóstico no início
+logger.info(f"Python version: {sys.version}")
+logger.info(f"Current directory: {os.getcwd()}")
+try:
+    logger.info(f"Directory contents: {os.listdir('.')}")
+except Exception as e:
+    logger.error(f"Erro ao listar diretório: {str(e)}")
+
+# Criar diretório de dados se não existir
+os.makedirs(DATA_DIR, exist_ok=True)
+logger.info(f"Diretório de dados configurado: {DATA_DIR}")
+logger.info(f"Conteúdo do diretório de dados: {os.listdir(DATA_DIR) if os.path.exists(DATA_DIR) else 'Diretório não existe'}")
+
+# THIS MUST BE THE FIRST STREAMLIT COMMAND
+st.set_page_config(
+    page_title="ValueHunter - Análise de Apostas Esportivas",
+    page_icon="⚽",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items=None
+)
+
+# Now you can run other Streamlit commands
+hide_admin_pages_completely()
+
+# Add the JavaScript component AFTER set_page_config
 st.components.v1.html("""
 <script>
 // Function to hide specific sidebar items
@@ -76,94 +117,11 @@ setTimeout(() => {
 }, 100);
 </script>
 """, height=0)
-# Importar módulos de utilidade
-from utils.core import (
-    DATA_DIR, init_session_state, show_valuehunter_logo, 
-    configure_sidebar_visibility, apply_global_css, init_stripe,
-    check_payment_success, handle_stripe_errors, hide_admin_pages_completely
-)
-from utils.data import UserManager
-
-# Configuração de logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger("valueHunter")
-
-# Log de diagnóstico no início
-logger.info(f"Python version: {sys.version}")
-logger.info(f"Current directory: {os.getcwd()}")
-try:
-    logger.info(f"Directory contents: {os.listdir('.')}")
-except Exception as e:
-    logger.error(f"Erro ao listar diretório: {str(e)}")
-
-# Criar diretório de dados se não existir
-os.makedirs(DATA_DIR, exist_ok=True)
-logger.info(f"Diretório de dados configurado: {DATA_DIR}")
-logger.info(f"Conteúdo do diretório de dados: {os.listdir(DATA_DIR) if os.path.exists(DATA_DIR) else 'Diretório não existe'}")
-
-# Configuração do Streamlit DEVE ser o primeiro comando Streamlit
-st.set_page_config(
-    page_title="ValueHunter - Análise de Apostas Esportivas",
-    page_icon="⚽",
-    layout="wide",
-    initial_sidebar_state="expanded",
-    menu_items=None  # Tenta remover o menu
-)
-
-# Apply hide_admin_pages_completely immediately
-hide_admin_pages_completely()
 
 # Ocultar o próprio app.py do menu de navegação e qualquer elemento do menu
 st.markdown("""
 <style>
-/* FORÇAR a barra lateral a permanecer visível */
-[data-testid="stSidebar"] {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    width: auto !important;
-    transform: none !important;
-}
-
-/* Ocultar apenas elementos de navegação do Streamlit, não a sidebar inteira */
-header[data-testid="stHeader"],
-footer,
-#MainMenu,
-[data-testid="collapsedControl"],
-button[kind="header"] {
-    display: none !important;
-}
-
-/* Ocultar apenas o container de navegação */
-section[data-testid="stSidebarNavContainer"],
-div.stSidebarNavItems, 
-button.stSidebarButton,
-div.st-emotion-cache-16idsys,
-ul.st-emotion-cache-pbk8do {
-    display: none !important;
-}
-
-/* Ocultar apenas a página app.py no menu - caso elementos acima não funcionem */
-[data-testid="stSidebarNav"] ul li,
-div[data-testid="stSidebarNav"] > div > ul > li {
-    display: none !important;
-}
-
-/* Ocultar items específicos no menu de navegação */
-[data-testid="stSidebarNavItems"] a:has(p:contains("app")),
-[data-testid="stSidebarNavItems"] a:has(p:contains("admin")),
-div[role="menu"] p:contains("app"),
-div[role="menu"] p:contains("admin"),
-div[role="dialog"] p:contains("app"),
-div[role="dialog"] p:contains("admin"),
-a[href*="app"], 
-a[href*="admin"],
-a[href*="_admin"] {
-    display: none !important;
-}
+/* Your existing CSS here */
 </style>
 """, unsafe_allow_html=True)
 
