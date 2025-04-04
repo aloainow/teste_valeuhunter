@@ -88,7 +88,42 @@ def configure_sidebar_visibility():
         }
     </style>
     """, unsafe_allow_html=True)
-
+def hide_admin_pages_completely():
+    """
+    This function adds more aggressive CSS selectors to completely hide admin pages
+    from the sidebar and any navigation elements
+    """
+    st.markdown("""
+    <style>
+        /* Hide everything in the sidebar */
+        [data-testid="stSidebarNavItems"] li a:nth-child(n),
+        [data-testid="stSidebarNavItems"] div a:nth-child(n),
+        [data-testid="stSidebarNav"] li a:nth-child(n),
+        div.sidebar a:nth-child(n),
+        div[role="navigation"] li:nth-child(n),
+        div[role="menu"] a:nth-child(n) {
+            display: none !important;
+        }
+        
+        /* Only show the specific pages we want */
+        [data-testid="stSidebarNavItems"] li a[href*="dashboard"],
+        [data-testid="stSidebarNavItems"] li a[href*="landing"],
+        [data-testid="stSidebarNavItems"] li a[href*="packages"],
+        div[role="menu"] a[href*="dashboard"],
+        div[role="menu"] a[href*="landing"],
+        div[role="menu"] a[href*="packages"] {
+            display: block !important;
+        }
+        
+        /* Hide pages in dropdown menus */
+        div[role="dialog"] a[href*="app"],
+        div[role="dialog"] a[href*="admin"],
+        div[aria-modal="true"] a[href*="app"],
+        div[aria-modal="true"] a[href*="admin"] {
+            display: none !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 def hide_streamlit_menu():
     """Oculta o menu de navegação do Streamlit e outros elementos da interface padrão"""
     return """
@@ -1214,51 +1249,3 @@ def apply_responsive_styles():
     """, unsafe_allow_html=True)
 # Add this to your core.py file or modify the existing CSS functions
 
-def hide_admin_pages_completely():
-    """
-    This function adds more aggressive CSS selectors to completely hide admin pages
-    from the sidebar and any navigation elements
-    """
-    st.markdown("""
-    <style>
-        /* Target the sidebar navigation items directly */
-        [data-testid="stSidebarNavItems"] li:has(a[href*="app"]),
-        [data-testid="stSidebarNavItems"] li:has(a[href*="admin"]),
-        section[data-testid="stSidebarNavContainer"] li:has(a[href*="app"]),
-        section[data-testid="stSidebarNavContainer"] li:has(a[href*="admin"]) {
-            display: none !important;
-        }
-        
-        /* Additional selectors for the dropdown menu shown in your screenshot */
-        div[role="menu"] a[href*="app"],
-        div[role="menu"] a[href*="admin"],
-        div[role="menu"] [data-testid="stSidebarNavItems"] a:has(p:contains("app")),
-        div[role="menu"] [data-testid="stSidebarNavItems"] a:has(p:contains("admin")) {
-            display: none !important;
-        }
-        
-        /* Target the text content directly */
-        a[href*="app"], 
-        a[href*="admin"],
-        a[href*="_admin"],
-        a[href*="/_admin"] {
-            display: none !important;
-        }
-        
-        /* Hide from dropdown/modal using more specific selectors */
-        div[aria-modal="true"] a[href*="app"],
-        div[aria-modal="true"] a[href*="admin"],
-        div[role="dialog"] a[href*="app"],
-        div[role="dialog"] a[href*="admin"] {
-            display: none !important;
-        }
-
-        /* Hide based on menu text content */
-        div[role="menu"] p:has(text()="app"),
-        div[role="menu"] p:has(text()="admin"),
-        div[role="menu"] span:has(text()="app"),
-        div[role="menu"] span:has(text()="admin") {
-            display: none !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
