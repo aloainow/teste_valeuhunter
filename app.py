@@ -5,6 +5,30 @@ import sys
 import streamlit as st
 from datetime import datetime
 
+# Initialize session state first - before any other code
+if "page" not in st.session_state:
+    st.session_state.page = "landing"
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "email" not in st.session_state:
+    st.session_state.email = None
+if "show_register" not in st.session_state:
+    st.session_state.show_register = False
+if "show_checkout" not in st.session_state:
+    st.session_state.show_checkout = False
+if "checkout_credits" not in st.session_state:
+    st.session_state.checkout_credits = 0
+if "checkout_amount" not in st.session_state:
+    st.session_state.checkout_amount = 0
+if "last_stripe_session_id" not in st.session_state:
+    st.session_state.last_stripe_session_id = None
+if "stripe_test_mode" not in st.session_state:
+    st.session_state.stripe_test_mode = True
+if "debug_mode" not in st.session_state:
+    st.session_state.debug_mode = False
+if "use_sample_data" not in st.session_state:
+    st.session_state.use_sample_data = False
+
 # Importar módulos de utilidade
 from utils.core import (
     DATA_DIR, init_session_state, show_valuehunter_logo, 
@@ -42,7 +66,8 @@ st.set_page_config(
     menu_items=None  # Tenta remover o menu
 )
 
-# Corrija o CSS no início do arquivo app.py:
+# Apply hide_admin_pages_completely immediately
+hide_admin_pages_completely()
 
 # Ocultar o próprio app.py do menu de navegação e qualquer elemento do menu
 st.markdown("""
@@ -79,8 +104,22 @@ ul.st-emotion-cache-pbk8do {
 div[data-testid="stSidebarNav"] > div > ul > li {
     display: none !important;
 }
+
+/* Ocultar items específicos no menu de navegação */
+[data-testid="stSidebarNavItems"] a:has(p:contains("app")),
+[data-testid="stSidebarNavItems"] a:has(p:contains("admin")),
+div[role="menu"] p:contains("app"),
+div[role="menu"] p:contains("admin"),
+div[role="dialog"] p:contains("app"),
+div[role="dialog"] p:contains("admin"),
+a[href*="app"], 
+a[href*="admin"],
+a[href*="_admin"] {
+    display: none !important;
+}
 </style>
 """, unsafe_allow_html=True)
+
 # Importar e disponibilizar funções e classes principais
 from utils.core import (
     go_to_login, go_to_register, go_to_landing,
@@ -196,6 +235,7 @@ def main():
         logger.error(f"Erro geral na aplicação: {str(e)}")
         import traceback
         traceback.print_exc()
+
 def route_pages():
     if st.session_state.page == "landing":
         show_landing_page()
