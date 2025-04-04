@@ -1,4 +1,4 @@
-# utils/core.py - Funções Principais
+ # utils/core.py - Funções Principais
 import os
 import json
 import time
