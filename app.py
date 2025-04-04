@@ -9,7 +9,7 @@ from datetime import datetime
 from utils.core import (
     DATA_DIR, init_session_state, show_valuehunter_logo, 
     configure_sidebar_visibility, apply_global_css, init_stripe,
-    check_payment_success, handle_stripe_errors
+    check_payment_success, handle_stripe_errors, hide_admin_pages_completely
 )
 from utils.data import UserManager
 
@@ -170,7 +170,10 @@ def main():
         
         # Initialize Stripe
         init_stripe()
-        
+
+        # Apply the CSS immediately at app start
+        hide_admin_pages_completely()
+
         # Check for payment from popup
         popup_payment = False
         if 'check_payment' in st.query_params and st.query_params.check_payment == 'true':
