@@ -1,10 +1,14 @@
 # pages/landing.py - Página Inicial
 import streamlit as st
 import logging
-from utils.core import show_valuehunter_logo, go_to_login, go_to_register
+from utils.core import show_valuehunter_logo, go_to_login, go_to_register, init_session_state
 
 # Configuração de logging
 logger = logging.getLogger("valueHunter.landing")
+
+# Initialize session state first
+if "page" not in st.session_state:
+    st.session_state.page = "landing"
 
 def show_landing_page():
     """Display landing page with about content and login/register buttons"""
